@@ -1,6 +1,6 @@
 <?php
  
-class TextAreaCounter extends WireData implements Module {
+class TextareaCounter extends WireData implements Module {
  
     /**
      * getModuleInfo is a module required by all modules to tell ProcessWire about them
@@ -47,7 +47,7 @@ class TextAreaCounter extends WireData implements Module {
         
         $f = $this->modules->get('InputfieldInteger');
         $f->label = $this->_('Max. words');
-        $f->description = $this_('The maximum amount of words that can be entered.');
+        $f->description = $this->_('The maximum amount of words that can be entered.');
         $f->attr('name','maxwords');
         $value = $this->fields->get($event->object->name)->maxwords;
         $f->attr('value', $value ? $value : '');
