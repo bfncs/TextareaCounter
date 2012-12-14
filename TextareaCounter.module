@@ -133,7 +133,7 @@ class TextareaCounter extends WireData implements Module {
                 // if too long, undo the change...
                 $inputfield->untrackChange('value');
                 // ...and show an error
-                $inputfield->error($this->_("Too many {$type}"));
+                $inputfield->error(sprintf($this->_("Too many %s"), $type));
             } else {
                 $inputfield->value = trim($inputfield->value);
             }
