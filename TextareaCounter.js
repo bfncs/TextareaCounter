@@ -1,9 +1,8 @@
 (function ($) {
 
-  'use strict';
   $.fn.TextareaCounter = function (options) {
     var opts = $.extend($.fn.TextareaCounter.defaults, options);
-    return this.each(function() {
+    return this.each(function () {
       var $this = $(this),
         $status = $this.parent().find(opts.statusSelector),
         $statusCount = $status.find(opts.statusCountSelector),
@@ -32,7 +31,7 @@
     'statusSelector': 'span.counterChars',
     'statusCountSelector': 'span',
     'maxLengthAttribute': 'data-maxchars',
-    'countFn': function (val) {return val.trim().replace(/\r?\n/g, '\r\n').length;}
+    'countFn': function (val) {return val.trim().replace(/\r?\n/g, '\r\n').length; }
   };
 
   $(document).ready(function () {
@@ -40,7 +39,7 @@
     $('textarea[data-maxwords]').TextareaCounter({
       'statusSelector': 'span.counterWords',
       'maxLengthAttribute': 'data-maxwords',
-      'countFn': function (val) {return val.trim().split(/\s+/).length;}
+      'countFn': function (val) {return val.trim().split(/\s+/).length; }
     });
   });
 
