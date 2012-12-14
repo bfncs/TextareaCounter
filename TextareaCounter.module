@@ -134,16 +134,18 @@ class TextareaCounter extends WireData implements Module {
                 $inputfield->untrackChange('value');
                 // ...and show an error
                 $inputfield->error($this->_('Too many '.$type));
+            } else {
+                $inputfield->value = trim($inputfield->value);
             }
         }
     }
     
     private function countChars($str) {
-        return strlen($str);
+        return strlen(trim($str));
     }
     
     private function countWords($str) {
-        return count(preg_split('/\s+/', $str));
+        return count(preg_split('/\s+/', trim($str)));
     }
  
 }

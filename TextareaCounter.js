@@ -10,7 +10,7 @@
       var $this = $(this);
       var $span = $this.parent().find("span.counterChars span");
       $this.bind("keyup change", function() {
-        var count = $this.attr('data-maxchars') - $this.val().replace(/\r?\n/g, '\r\n').length;
+        var count = $this.attr('data-maxchars') - $this.val().trim().replace(/\r?\n/g, '\r\n').length;
         $span.text(count);
       });
     });
@@ -19,7 +19,7 @@
       var $this = $(this);
       var $span = $this.parent().find("span.counterWords span");
       $this.bind("keyup change", function () {
-        var count = $this.attr('data-maxwords') - $this.val().split(/\s+/).length;
+        var count = $this.attr('data-maxwords') - $this.val().trim().split(/\s+/).length;
         $span.text(count);
       });
     });
