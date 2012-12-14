@@ -20,5 +20,4 @@ Most of the code was helpfully [provided](http://processwire.com/talk/topic/2343
 ## Still missing
 
 * Proper documentation
-* A mechanism to (optionally) prevent the user from saving texts that are too long
 * An expansion to bring this functionality to flat text inputs as well.
