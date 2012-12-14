@@ -69,14 +69,14 @@ class TextareaCounter extends WireData implements Module {
         $inputfield = $this->fields->get($field->name);
         
         $types = array(
-          'chars',
-          'words'
+            'chars',
+            'words'
         );
         foreach ($types as $type) {
-          $max = $this->fields->get($event->object->name)->{'max'.$type};
-          if ($max && 0 < intval($max)) {
-            $field->attr('data-max'.$type, $inputfield->{'max'.$type});
-          }
+            $max = $this->fields->get($event->object->name)->{'max'.$type};
+            if ($max && 0 < intval($max)) {
+                $field->attr('data-max'.$type, $inputfield->{'max'.$type});
+            }
         }
     }
  
@@ -103,7 +103,7 @@ class TextareaCounter extends WireData implements Module {
         }
         if (0 < count($append)) {
           // render counter spans after text field
-          $event->return .= implode(' ', $append);
+          $event->return .= implode(', ', $append);
           // add scripts to admin page
           $this->config->scripts->add($this->config->urls->TextareaCounter . 'TextareaCounter.js');
         }
