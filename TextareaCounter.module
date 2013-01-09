@@ -141,7 +141,7 @@ class TextareaCounter extends WireData implements Module {
     }
     
     private function countChars($str) {
-        return strlen(trim($str));
+        return mb_strlen(trim($str));
     }
     
     private function countWords($str) {
