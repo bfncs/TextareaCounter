@@ -1,15 +1,17 @@
 <?php
- 
-class TextareaCounter extends WireData implements Module {
- 
+
+class TextareaCounter extends WireData implements Module
+{
+
     /**
      * getModuleInfo is a module required by all modules to tell ProcessWire about them
      *
      * @return array
      *
      */
-    public static function getModuleInfo() {
- 
+    public static function getModuleInfo()
+    {
+
         return array(
             'title' => 'Textarea Counter',
             'version' => 100,
@@ -17,118 +19,166 @@ class TextareaCounter extends WireData implements Module {
             'href' => 'https://github.com/boundaryfunctions/TextareaCounter/',
             'singular' => true,
             'autoload' => true
-            );
+        );
     }
- 
-    public function init() {
- 
+
+    public function init()
+    {
+
         $this->addHookAfter('InputfieldTextarea::getConfigInputfields', $this, 'hookAddConfig');
         $this->addHookBefore('InputfieldTextarea::render', $this, 'renderBeforeTextarea');
         $this->addHookAfter('InputfieldTextarea::render', $this, 'renderTextarea');
         $this->addHookAfter('InputfieldTextarea::processInput', $this, 'validateField');
- 
+
     }
- 
- 
-    public function hookAddConfig(HookEvent $event) {
+
+    public function hookAddConfig(HookEvent $event)
+    {
         // not tinymce fields
-        if($event->object == 'InputfieldTinyMCE') return;
- 
+        if ($event->object == 'InputfieldTinyMCE') {
+            return;
+        }
+
         // get inputfields from getConfigInputfields
         $inputfields = $event->return;
- 
+
         // add maxchars setting
         $f = $this->modules->get('InputfieldInteger');
         $f->label = $this->_('Max. characters');
         $f->description = $this->_('The maximum amount of characters that can be entered.');
-        $f->attr('name','maxchars');
+        $f->attr('name', 'maxchars');
         $value = $this->fields->get($event->object->name)->maxchars;
         $f->attr('value', $value ? $value : '');
         $inputfields->append($f);
-        
+
         $f = $this->modules->get('InputfieldInteger');
         $f->label = $this->_('Max. words');
         $f->description = $this->_('The maximum amount of words that can be entered.');
-        $f->attr('name','maxwords');
+        $f->attr('name', 'maxwords');
         $value = $this->fields->get($event->object->name)->maxwords;
         $f->attr('value', $value ? $value : '');
         $inputfields->append($f);
     }
- 
-    public function renderBeforeTextarea(HookEvent $event){
- 
+
+    public function renderBeforeTextarea(HookEvent $event)
+    {
+
         // only on page edits screens
-        if($this->process != 'ProcessPageEdit') return;
- 
+        if ($this->process != 'ProcessPageEdit') {
+            return;
+        }
+
         $field = $event->object;
- 
+
         // no tinymce fields
-        if($field == 'InputfieldTinyMCE') return;
- 
+        if ($field == 'InputfieldTinyMCE') {
+            return;
+        }
+
+        // If the field is in a repeater, it will have the next text in the name.
+        $pos = strpos($field->name, "_repeater");
+
+        // We need only the name of the field to determine their attributes
+        if ($pos) {
+            $fieldName = substr($field->name, 0, $pos);
+        } else {
+            $fieldName = $field->name;
+        }
+
         // get field to set attribute, will get rendered by the InputfieldTexarea
-        $inputfield = $this->fields->get($field->name);
-        
+        $inputfield = $this->fields->get($fieldName);
+
         $types = array(
             'chars',
             'words'
         );
         foreach ($types as $type) {
-            $max = $this->fields->get($event->object->name)->{'max'.$type};
+            $max = $inputfield->{'max' . $type};
             if ($max && 0 < intval($max)) {
-                $field->attr('data-max'.$type, $inputfield->{'max'.$type});
+                $field->attr('data-max' . $type, $inputfield->{'max' . $type});
             }
         }
     }
- 
-    public function renderTextarea(HookEvent $event){
-        // add stuff only to admin pages edit screen
-        if($this->process != 'ProcessPageEdit') return;
- 
-        // not render span if tinymce field
-        if($event->object == 'InputfieldTinyMCE') return;
-        
-        $labels = array(
-          'chars' => $this->_('Characters left'),
-          'words' => $this->_('Words left')
-        );
-        $append = array();
+
+    public function renderTextarea(HookEvent $event)
+    {
+
+        $field = $event->object;
         $value = $event->object->value;
-        
+
+        // If the field is in a repeater, it will have the next text in the name.
+        $pos = strpos($field->name, "_repeater");
+
+        // add stuff only to admin pages edit screen
+        if ($this->process != 'ProcessPageEdit') {
+            return;
+        }
+
+        // not render span if tinymce field
+        if ($field == 'InputfieldTinyMCE') {
+            return;
+        }
+
+        $labels = array(
+            'chars' => $this->_('Characters left'),
+            'words' => $this->_('Words left')
+        );
+
+        $append = array();
+
+        //We need only the name of the field to determine their attributes
+        if ($pos) {
+            $fieldName = substr($field->name, 0, $pos);
+        } else {
+            $fieldName = $field->name;
+        }
+
         foreach ($labels as $type => $label) {
-            $max = $this->fields->get($event->object->name)->{'max'.$type};
+            $max = $this->fields->get($fieldName)->{'max' . $type};
             if ($max && 0 < intval($max)) {
-                $left = $max - $this->{'count'.ucfirst($type)}($value);
-                $append[] = '<span class="counter'.ucfirst($type).'">'.$label.': <span class="counterVal">'.$left.'</span></span>';
+                $left = $max - $this->{'count' . ucfirst($type)}($value);
+                $append[] = '<span class="counter' . ucfirst($type) . '">'
+                    . $label . ': '
+                    . '<span class="counterVal">'
+                    . $left
+                    . '</span></span>';
             }
         }
         if (0 < count($append)) {
-          // render counter spans after text field
-          $event->return .= implode(', ', $append);
-          // add scripts to admin page
-          $this->config->scripts->add($this->config->urls->TextareaCounter . 'TextareaCounter.js');
+            // render counter spans after text field
+            $event->return .= implode(', ', $append);
+            // add scripts to admin page
+            $this->config->scripts->add($this->config->urls->TextareaCounter . 'TextareaCounter.js');
         }
     }
-    
-    public function validateField(HookEvent $event) {
+
+    public function validateField(HookEvent $event)
+    {
         $inputfield = $event->object;
-        if (!($inputfield instanceof InputfieldTextarea)) return;
+        if (!($inputfield instanceof InputfieldTextarea)) {
+            return;
+        }
         $types = array(
             'chars',
             'words'
         );
         foreach ($types as $type) {
-            $configField = $inputfield->getConfigInputfields()->get('max'.$type);
-            if (!(is_object($configField) && $configField instanceof InputfieldInteger)) return;
-            
+            $configField = $inputfield->getConfigInputfields()->get('max' . $type);
+            if (!(is_object($configField) && $configField instanceof InputfieldInteger)) {
+                return;
+            }
+
             // get the value for maximum length
             $max = $configField->value;
-            
+
             // do nothing if empty
-            if (!($max && 0 < intval($max))) return;
-            
+            if (!($max && 0 < intval($max))) {
+                return;
+            }
+
             // count chars/words of the inputfield
-            $inputfieldLength = $this->{'count'.ucfirst($type)}($inputfield->value);
-            
+            $inputfieldLength = $this->{'count' . ucfirst($type)}($inputfield->value);
+
             if ($inputfieldLength > $max) {
                 // if too long, undo the change...
                 $inputfield->untrackChange('value');
@@ -139,13 +189,15 @@ class TextareaCounter extends WireData implements Module {
             }
         }
     }
-    
-    private function countChars($str) {
+
+    private function countChars($str)
+    {
         return mb_strlen(trim($str));
     }
-    
-    private function countWords($str) {
+
+    private function countWords($str)
+    {
         return count(preg_split('/\s+/', trim($str)));
     }
- 
+
 }
