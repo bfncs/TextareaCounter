@@ -6,12 +6,21 @@
       var $this = $(this),
         $status = $this.parent().find(opts.statusSelector),
         $statusCount = $status.find(opts.statusCountSelector),
+        truncate = $this.parent().find('[data-truncate]'),
         maxLen = $this.attr(opts.maxLengthAttribute),
         countFn = opts.countFn,
         lastVal = $this.val();
+
       $this.bind('keyup change', function () {
         var left = maxLen - countFn($this.val());
         if (0 > left) {
+          if(truncate.length) {
+            if($status.hasClass('counterWords')) {
+              lastVal = $this.val().split(" ").splice(0,maxLen).join(" ");
+            } else {
+              lastVal = $this.val().substr(0, maxLen);
+            }
+          }
           if (!$this.hasClass('ui-state-error')) {
             $this.val(lastVal);
             $status.addClass('ui-state-error');

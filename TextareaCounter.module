@@ -14,7 +14,7 @@ class TextareaCounter extends WireData implements Module
 
         return array(
             'title' => 'Textarea Counter',
-            'version' => 101,
+            'version' => 102,
             'summary' => 'Set limits for the count of characters and/or words in textarea inputs with direct feedback while typing.',
             'href' => 'https://github.com/boundaryfunctions/TextareaCounter/',
             'singular' => true,
@@ -57,6 +57,14 @@ class TextareaCounter extends WireData implements Module
         $f->attr('name', 'maxwords');
         $value = $this->fields->get($event->object->name)->maxwords;
         $f->attr('value', $value ? $value : '');
+        $inputfields->append($f);
+
+        $f = $this->modules->get('InputfieldCheckbox');
+        $f->label = $this->_('Truncate text');
+        $f->description = $this->_('Reduce the inserted text to the Max length instead of revert to the old value.');
+        $f->attr('name', 'truncate');
+        $value = $this->fields->get($event->object->name)->truncate;
+        $f->attr('checked', ($value ? 'checked' : ''));
         $inputfields->append($f);
     }
 
@@ -133,11 +141,13 @@ class TextareaCounter extends WireData implements Module
             $fieldName = $field->name;
         }
 
+        $truncate = $this->fields->get($fieldName)->truncate ? ' data-truncate="1"' : null;
+
         foreach ($labels as $type => $label) {
             $max = $this->fields->get($fieldName)->{'max' . $type};
             if ($max && 0 < intval($max)) {
                 $left = $max - $this->{'count' . ucfirst($type)}($value);
-                $append[] = '<span class="counter' . ucfirst($type) . '">'
+                $append[] = '<span class="counter' . ucfirst($type) . '"' . $truncate . '>'
                     . $label . ': '
                     . '<span class="counterVal">'
                     . $left
