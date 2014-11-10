@@ -14,7 +14,7 @@ class TextareaCounter extends WireData implements Module
 
         return array(
             'title' => 'Textarea Counter',
-            'version' => 102,
+            'version' => 103,
             'summary' => 'Set limits for the count of characters and/or words in textarea inputs with direct feedback while typing.',
             'href' => 'https://github.com/boundaryfunctions/TextareaCounter/',
             'singular' => true,
