@@ -34,8 +34,9 @@ class TextareaCounter extends WireData implements Module
 
     public function hookAddConfig(HookEvent $event)
     {
-        // not tinymce fields
-        if ($event->object == 'InputfieldTinyMCE') {
+        $field = $event->object;
+        // Don't add config for TinyMCE or CKEditor fields
+        if ($field == 'InputfieldTinyMCE' || $field == 'InputfieldCKEditor') {
             return;
         }
 
@@ -47,7 +48,7 @@ class TextareaCounter extends WireData implements Module
         $f->label = $this->_('Max. characters');
         $f->description = $this->_('The maximum amount of characters that can be entered.');
         $f->attr('name', 'maxchars');
-        $value = $this->fields->get($event->object->name)->maxchars;
+        $value = $this->fields->get($field->name)->maxchars;
         $f->attr('value', $value ? $value : '');
         $inputfields->append($f);
 
@@ -55,7 +56,7 @@ class TextareaCounter extends WireData implements Module
         $f->label = $this->_('Max. words');
         $f->description = $this->_('The maximum amount of words that can be entered.');
         $f->attr('name', 'maxwords');
-        $value = $this->fields->get($event->object->name)->maxwords;
+        $value = $this->fields->get($field->name)->maxwords;
         $f->attr('value', $value ? $value : '');
         $inputfields->append($f);
 
@@ -63,23 +64,22 @@ class TextareaCounter extends WireData implements Module
         $f->label = $this->_('Truncate text');
         $f->description = $this->_('Reduce the inserted text to the Max length instead of revert to the old value.');
         $f->attr('name', 'truncate');
-        $value = $this->fields->get($event->object->name)->truncate;
+        $value = $this->fields->get($field->name)->truncate;
         $f->attr('checked', ($value ? 'checked' : ''));
         $inputfields->append($f);
     }
 
     public function renderBeforeTextarea(HookEvent $event)
     {
+        $field = $event->object;
 
-        // only on page edits screens
+        // Only for page edit process
         if ($this->process != 'ProcessPageEdit') {
             return;
         }
 
-        $field = $event->object;
-
-        // no tinymce fields
-        if ($field == 'InputfieldTinyMCE') {
+        // Don't render for TinyMCE or CKEditor fields
+        if ($field == 'InputfieldTinyMCE' || $field == 'InputfieldCKEditor') {
             return;
         }
 
@@ -110,9 +110,8 @@ class TextareaCounter extends WireData implements Module
 
     public function renderTextarea(HookEvent $event)
     {
-
         $field = $event->object;
-        $value = $event->object->value;
+        $value = $field->value;
 
         // If the field is in a repeater, it will have the next text in the name.
         $pos = strpos($field->name, "_repeater");
@@ -122,8 +121,8 @@ class TextareaCounter extends WireData implements Module
             return;
         }
 
-        // not render span if tinymce field
-        if ($field == 'InputfieldTinyMCE') {
+        // Don't render for TinyMCE or CKEditor fields
+        if ($field == 'InputfieldTinyMCE' || $field == 'InputfieldCKEditor') {
             return;
         }
 
