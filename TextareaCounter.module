@@ -36,7 +36,12 @@ class TextareaCounter extends WireData implements Module
     {
         $field = $event->object;
         // Don't add config for TinyMCE or CKEditor fields
-        if ($field == 'InputfieldTinyMCE' || $field == 'InputfieldCKEditor') {
+        if (!$field || $field == 'InputfieldTinyMCE' || $field == 'InputfieldCKEditor') {
+            return;
+        }
+
+        // Only add config for ProcessField process
+        if ($this->process != 'ProcessField') {
             return;
         }
 
@@ -73,13 +78,13 @@ class TextareaCounter extends WireData implements Module
     {
         $field = $event->object;
 
-        // Only for page edit process
-        if ($this->process != 'ProcessPageEdit') {
+        // Don't render for TinyMCE or CKEditor fields
+        if (!$field || $field == 'InputfieldTinyMCE' || $field == 'InputfieldCKEditor') {
             return;
         }
 
-        // Don't render for TinyMCE or CKEditor fields
-        if ($field == 'InputfieldTinyMCE' || $field == 'InputfieldCKEditor') {
+        // Only for page edit process
+        if ($this->process != 'ProcessPageEdit') {
             return;
         }
 
@@ -113,16 +118,16 @@ class TextareaCounter extends WireData implements Module
         $field = $event->object;
         $value = $field->value;
 
+        // Don't render for TinyMCE or CKEditor fields
+        if (!$field || $field == 'InputfieldTinyMCE' || $field == 'InputfieldCKEditor') {
+            return;
+        }
+
         // If the field is in a repeater, it will have the next text in the name.
         $pos = strpos($field->name, "_repeater");
 
         // add stuff only to admin pages edit screen
         if ($this->process != 'ProcessPageEdit') {
-            return;
-        }
-
-        // Don't render for TinyMCE or CKEditor fields
-        if ($field == 'InputfieldTinyMCE' || $field == 'InputfieldCKEditor') {
             return;
         }
 
